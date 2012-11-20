@@ -3,7 +3,9 @@ var people = new Array();
 var movieList = new Array();
 
 function search() {
-	var search = document.getElementById('searchBox').value;
+	$('#spinner').show();
+	var search = $("#searchBox").val();
+	$("#searchBox").val("");
 	search = search.replace(/ /g,"+");
 	searchPerson(search);
 }
@@ -18,7 +20,7 @@ function searchPerson(name) {
 }
 
 function searchPersonCallback(result) {
-	var resultHTML = "<table border='1'><tr>";
+	var resultHTML = "<table border='1' width='100%'><tr>";
 	for (var i = 0; i < result.length; i++) {
 		var imageURL = "";
 		if (result[i]["profile"].length > 0) {
@@ -31,10 +33,15 @@ function searchPersonCallback(result) {
 		resultHTML += "</tr>";
 	}
 	$("#searchResults").html(resultHTML);
+	$('#spinner').hide();
+	$("#searchResults").dialog( "open" );
 }
 
 function addPerson(id) {
+	$('#spinner').show();
+	$("#searchResults").dialog( "close" );
 	$("#searchResults").html("");
+	
 	url = "http://api.themoviedb.org/2.1/Person.getInfo/en/json/"+apiKey+"/"+id;
 	$.ajax({
 		url: url,
@@ -47,21 +54,33 @@ function addPersonCallback(result) {
 	people[result[0]["id"]] = result[0];
 	updatePeopleList();
 	updateMoveList();
+	$('#spinner').hide();
+}
+
+function removePerson(id) {
+	delete people[id];
+	updatePeopleList();
+	updateMoveList();
 }
 
 function updatePeopleList() {
-	var listHTML = "<table border='1'><tr>";
-	for (var id in people) {
-		var imageURL = "";
-		if (people[id]["profile"].length > 0) {
-			imageURL = people[id]["profile"][0]["image"]["url"];
+	if (people.length > 0) {
+		var listHTML = "<table border='1'><tr>";
+		for (var id in people) {
+			var imageURL = "";
+			if (people[id]["profile"].length > 0) {
+				imageURL = people[id]["profile"][0]["image"]["url"];
+			}
+			listHTML += "<tr>";
+			listHTML += "<td><img src='"+imageURL+"'></td>";
+			listHTML += "<td>"+people[id]["name"]+"</td>";
+			listHTML += "<td><button onclick='removePerson("+id+")'>Remove</button></td>";
+			listHTML += "</tr>";
 		}
-		listHTML += "<tr>";
-		listHTML += "<td><img src='"+imageURL+"'></td>";
-		listHTML += "<td>"+people[id]["name"]+"</td>";
-		listHTML += "</tr>";
+		$("#actorList").html(listHTML);
+	} else {
+		$("#actorList").html("");
 	}
-	$("#actorList").html(listHTML);
 }
 
 function updateMoveList() {
@@ -72,7 +91,6 @@ function updateMoveList() {
 			firstID = id;
 			break
 		}
-		//movieList = $.extend(true,[],people[id]["filmography"]);
 	}
 	for (var id in people) {
 		if (id == firstID) {
@@ -87,30 +105,68 @@ function updateMoveList() {
 			for (var mid in list) {
 				movie = list[mid];
 				movieID = movie["id"];
-				alert(movieID);
 				
 				if (movieID in movieList) {
 					tempMovieList[movieID] = movie;
 				}
 			}
 			movieList = tempMovieList;
-			/*
-			for (var mid in movieList) {
-				if (!mid in movies) {
-					movieList.splice(mid,1);
-				}
-			}
-			*/
 		}
 	}
 	
+	//Sort movieList
+	movieList.sort(movieSorter);
 	
-	var movieHTML = "<table border='1'><tr>";
-	for (var mid in movieList) {
-		movieHTML += "<tr>";
-		movieHTML += "<td>"+movieList[mid]["name"]+"</td>";
-		movieHTML += "</tr>";
-		
+	if (movieList.length > 0) {
+		var movieHTML = "<table border='1'><tr>";
+		for (var mid in movieList) {
+			movie = movieList[mid];
+			movieHTML += "<tr>";
+			imageURL = movie["poster"];
+			movieHTML += "<td><img src='"+imageURL+"'></td>";
+			movieHTML += "<td>"+movie["name"]+"</td>";
+			releaseDate = movie["release"];
+			if (releaseDate == null) {
+				movieHTML += "<td>TBD</td>";
+			} else {
+				movieHTML += "<td>"+releaseDate+"</td>";
+			}
+			movieHTML += "</tr>";
+			
+		}
+		$("#movieList").html(movieHTML);
+	} else {
+		$("#movieList").html("");
 	}
-	$("#movieList").html(movieHTML);
 }
+
+function movieSorter(a,b) {
+	var aDateString = a["release"];
+	var bDateString = b["release"];
+	if (aDateString == null) {
+		return -1;
+	}else if (bDateString == null) {
+		return 1;
+	} else {
+		aDate = new Date(aDateString);
+		bDate = new Date(bDateString);
+		if (aDate > bDate) {
+			return -1;
+		} else {
+			return 1;
+		}
+	}
+}
+
+$.fx.speeds._default = 1000;
+$(function() {
+	$( "#searchResults" ).dialog({
+		autoOpen: false,
+		show: "blind",
+		hide: "explode",
+		width: 400,
+		maxHeight: 400
+	});
+	
+	$('#spinner').hide();
+});
