@@ -67,7 +67,7 @@ function addPersonCallback(result) {
 	var id = result[0]["name"]+result[0]["id"];
 	people[id] = result[0];
 	updatePeopleList();
-	updateMoveList();
+	updateMovieList();
 	$('#spinner').hide();
 }
 
@@ -76,7 +76,7 @@ function removePerson(id) {
 	$("#movieList").hide("slide", {direction: "right"},250, function() {
 		delete people[id];
 		updatePeopleList();
-		updateMoveList();
+		updateMovieList();
 	});
 }
 
@@ -131,7 +131,7 @@ function getJob(person,movie) {
 	
 }
 
-function updateMoveList() {
+function updateMovieList() {
 	movieList.length = 0;
 	var firstID = true;
 	for (var id in people) {
@@ -186,6 +186,11 @@ function updateMoveList() {
 			movieHTML += "</tr>";
 			
 		}
+		$("#movieList").html(movieHTML);
+	} else if (numPeople() > 0) {
+		var movieHTML = "Mutual Movies";
+		movieHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr><td align='center'>";
+		movieHTML += "These people have not been in a movie together!</td></tr></table>"
 		$("#movieList").html(movieHTML);
 	} else {
 		$("#movieList").html("");
