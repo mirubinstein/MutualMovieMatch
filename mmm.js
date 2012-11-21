@@ -95,11 +95,11 @@ function updatePeopleList() {
 		for (var id in people) {
 			var imageURL = "";
 			if (people[id]["profile"].length > 0) {
-				imageURL = people[id]["profile"][0]["image"]["url"];
+				imageURL = people[id]["profile"][1]["image"]["url"];
 			}
 			listHTML += "<tr>";
-			listHTML += "<td width='45%'><img src='"+imageURL+"'></td>";
-			listHTML += "<td width='45%'>"+people[id]["name"]+"</td>";
+			listHTML += "<td width='30%'><img src='"+imageURL+"' width='100%'></td>";
+			listHTML += "<td width='60%'>"+people[id]["name"]+"</td>";
 			listHTML += "<td width='10%'><button onclick='removePerson(\""+id+"\")'>X</button></td>";
 			listHTML += "</tr>";
 		}
@@ -112,16 +112,19 @@ function updatePeopleList() {
 
 function getJob(person,movie) {
 	var films = people[person]["filmography"];
+	var jobs = "";
 	for (var i = 0; i < films.length; i++) {
 		if (films[i]["id"] == movie){
 			var job = films[i]["job"];
 			if (job == "Actor") {
-				return films[i]["character"];
+				jobs += films[i]["character"] + ", ";
 			} else {
-				return films[i]["job"];
+				jobs += films[i]["job"] + ", ";
 			}
 		}
 	}
+	return jobs.slice(0,-2);
+	
 }
 
 function updateMoveList() {
