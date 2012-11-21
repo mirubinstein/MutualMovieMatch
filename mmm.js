@@ -99,7 +99,11 @@ function updatePeopleList() {
 			}
 			listHTML += "<tr>";
 			listHTML += "<td width='30%'><img src='"+imageURL+"' width='100%'></td>";
-			listHTML += "<td width='60%'>"+people[id]["name"]+"</td>";
+			
+			listHTML += "<td width='60%'><b>"+people[id]["name"]+"</b><BR>";
+			listHTML += "Born " + people[id]["birthday"] + "<BR>";
+			listHTML += "in " + people[id]["birthplace"] + "</td>";
+			
 			listHTML += "<td width='10%'><button onclick='removePerson(\""+id+"\")'>X</button></td>";
 			listHTML += "</tr>";
 		}
