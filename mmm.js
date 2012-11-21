@@ -51,7 +51,8 @@ function addPerson(id) {
 }
 
 function addPersonCallback(result) {
-	people[result[0]["id"]] = result[0];
+	var id = result[0]["name"]+result[0]["id"];
+	people[id] = result[0];
 	updatePeopleList();
 	updateMoveList();
 	$('#spinner').hide();
@@ -63,8 +64,16 @@ function removePerson(id) {
 	updateMoveList();
 }
 
+function numPeople() {
+	var size = 0, key;
+    for (key in people) {
+        if (people.hasOwnProperty(key)) size++;
+    }
+    return size;
+}
+
 function updatePeopleList() {
-	if (people.length > 0) {
+	if (numPeople() > 0) {
 		var listHTML = "<table border='1'><tr>";
 		for (var id in people) {
 			var imageURL = "";
@@ -74,7 +83,7 @@ function updatePeopleList() {
 			listHTML += "<tr>";
 			listHTML += "<td><img src='"+imageURL+"'></td>";
 			listHTML += "<td>"+people[id]["name"]+"</td>";
-			listHTML += "<td><button onclick='removePerson("+id+")'>Remove</button></td>";
+			listHTML += "<td><button onclick='removePerson(\""+id+"\")'>Remove</button></td>";
 			listHTML += "</tr>";
 		}
 		$("#actorList").html(listHTML);
@@ -85,20 +94,15 @@ function updatePeopleList() {
 
 function updateMoveList() {
 	movieList.length = 0;
-	var firstID = 0;
-	if (people.length > 0) {
-		for (var id in people) {
-			firstID = id;
-			break
-		}
-	}
+	var firstID = true;
 	for (var id in people) {
-		if (id == firstID) {
+		if (firstID) {
 			firstList = people[id]["filmography"];
 			for (var mid in firstList) {
 				movie = firstList[mid];
 				movieList[movie["id"]] = movie;
 			}
+			firstID = false;
 		} else {
 			var list = people[id]["filmography"];
 			var tempMovieList = new Array();
@@ -169,4 +173,10 @@ $(function() {
 	});
 	
 	$('#spinner').hide();
+	
+	$("#searchBox").keyup(function(event){
+		if(event.keyCode == 13){
+			search();
+		}
+	});
 });
