@@ -1,26 +1,29 @@
 <html>
 <head>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="styles.css" />
+
 <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
 <script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
    
 <script src="mmm.js"></script>
 </head>
 <body>
-
-<input type="text" id="searchBox">
-<button onclick="search()">Search</button>
-<div id="spinner"><img src="images/spinner.gif"></div>
-
-<div align="center" id="searchResults" title="Search Results">
+<div align="center" id="header">
+	<img src="images/header.png" width="600px">
 </div>
-<BR>
-<div id="actorList">
-
+<div align="center" id="searchDiv">
+	<input type="text" id="searchBox" size="50" placeholder="Enter a Person's Name">
+	<button onclick="search()">Search</button>
 </div>
-<BR>
-<div id="movieList">
 
-</div>
+<div align="center" id="spinner"><img src="images/loadbar.gif"></div>
+
+<div align="center" id="searchResults" title="Search Results"></div>
+
+<div align="center" id="actorList"></div>
+
+<div align="center" id="movieList"></div>
+
 </body>
 </html>

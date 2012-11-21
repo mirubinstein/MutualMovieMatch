@@ -5,7 +5,6 @@ var movieList = new Array();
 function search() {
 	$('#spinner').show();
 	var search = $("#searchBox").val();
-	$("#searchBox").val("");
 	search = search.replace(/ /g,"+");
 	searchPerson(search);
 }
@@ -20,34 +19,48 @@ function searchPerson(name) {
 }
 
 function searchPersonCallback(result) {
-	var resultHTML = "<table border='1' width='100%'><tr>";
-	for (var i = 0; i < result.length; i++) {
-		var imageURL = "";
-		if (result[i]["profile"].length > 0) {
-			imageURL = result[i]["profile"][0]["image"]["url"];
+	var resultHTML = "<button onclick='closeSearch()'>Close</button>";
+	if (result[0] != "Nothing found.") {
+		resultHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
+		for (var i = 0; i < result.length; i++) {
+			var imageURL = "";
+			if (result[i]["profile"].length > 0) {
+				imageURL = result[i]["profile"][0]["image"]["url"];
+			}
+			resultHTML += "<tr>";
+			resultHTML += "<td width='25%'><img src='"+imageURL+"'></td>";
+			resultHTML += "<td width='65%'>"+result[i]["name"]+"</td>";
+			resultHTML += "<td width='10%'><button onclick=addPerson("+result[i]["id"]+")>Add</button>";
+			resultHTML += "</tr>";
 		}
-		resultHTML += "<tr>";
-		resultHTML += "<td><img src='"+imageURL+"'></td>";
-		resultHTML += "<td>"+result[i]["name"]+"</td>";
-		resultHTML += "<td><button onclick=addPerson("+result[i]["id"]+")>Add</button>";
-		resultHTML += "</tr>";
+		
+		$("#searchBox").val("");
+	} else {
+		var search = $("#searchBox").val();
+		resultHTML += "<BR>No results for " + search;
 	}
 	$("#searchResults").html(resultHTML);
 	$('#spinner').hide();
-	$("#searchResults").dialog( "open" );
+	$("#searchResults").effect("slide",{ direction: "up" }, 250);
+}
+
+function closeSearch() {
+	$("#searchResults").hide("slide", {direction: "up"},250);
 }
 
 function addPerson(id) {
-	$('#spinner').show();
-	$("#searchResults").dialog( "close" );
-	$("#searchResults").html("");
-	
-	url = "http://api.themoviedb.org/2.1/Person.getInfo/en/json/"+apiKey+"/"+id;
-	$.ajax({
-		url: url,
-		dataType: 'jsonp',
-		jsonpCallback:'addPersonCallback'
+	$("#actorList").hide("slide", {direction: "left"},250);
+	$("#movieList").hide("slide", {direction: "right"},250);
+	$("#searchResults").hide("slide", {direction: "up"},250, function() {
+		$('#spinner').show();
+		url = "http://api.themoviedb.org/2.1/Person.getInfo/en/json/"+apiKey+"/"+id;
+		$.ajax({
+			url: url,
+			dataType: 'jsonp',
+			jsonpCallback:'addPersonCallback'
+		});
 	});
+	
 }
 
 function addPersonCallback(result) {
@@ -59,9 +72,12 @@ function addPersonCallback(result) {
 }
 
 function removePerson(id) {
-	delete people[id];
-	updatePeopleList();
-	updateMoveList();
+	$("#actorList").hide("slide", {direction: "left"},250);
+	$("#movieList").hide("slide", {direction: "right"},250, function() {
+		delete people[id];
+		updatePeopleList();
+		updateMoveList();
+	});
 }
 
 function numPeople() {
@@ -74,21 +90,37 @@ function numPeople() {
 
 function updatePeopleList() {
 	if (numPeople() > 0) {
-		var listHTML = "<table border='1'><tr>";
+		var listHTML = "Actor List";
+		listHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
 		for (var id in people) {
 			var imageURL = "";
 			if (people[id]["profile"].length > 0) {
 				imageURL = people[id]["profile"][0]["image"]["url"];
 			}
 			listHTML += "<tr>";
-			listHTML += "<td><img src='"+imageURL+"'></td>";
-			listHTML += "<td>"+people[id]["name"]+"</td>";
-			listHTML += "<td><button onclick='removePerson(\""+id+"\")'>Remove</button></td>";
+			listHTML += "<td width='45%'><img src='"+imageURL+"'></td>";
+			listHTML += "<td width='45%'>"+people[id]["name"]+"</td>";
+			listHTML += "<td width='10%'><button onclick='removePerson(\""+id+"\")'>X</button></td>";
 			listHTML += "</tr>";
 		}
 		$("#actorList").html(listHTML);
 	} else {
 		$("#actorList").html("");
+	}
+	$("#actorList").effect("slide",{ direction: "left" }, 250);
+}
+
+function getJob(person,movie) {
+	var films = people[person]["filmography"];
+	for (var i = 0; i < films.length; i++) {
+		if (films[i]["id"] == movie){
+			var job = films[i]["job"];
+			if (job == "Actor") {
+				return films[i]["character"];
+			} else {
+				return films[i]["job"];
+			}
+		}
 	}
 }
 
@@ -122,16 +154,25 @@ function updateMoveList() {
 	movieList.sort(movieSorter);
 	
 	if (movieList.length > 0) {
-		var movieHTML = "<table border='1'><tr>";
+		var movieHTML = "Mutual Movies";
+		movieHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
 		for (var mid in movieList) {
 			movie = movieList[mid];
 			movieHTML += "<tr>";
 			imageURL = movie["poster"];
-			movieHTML += "<td><img src='"+imageURL+"'></td>";
-			movieHTML += "<td>"+movie["name"]+"</td>";
+			movieHTML += "<td width='25%'><img src='"+imageURL+"' width='80%'></td>";
+			
+			movieHTML += "<td width='55%'><h3>"+movie["name"]+"</h3>";
+			for (var id in people) {
+				var person = "<b>"+people[id]["name"]+"</b>";
+				var role = getJob(id,movie["id"]);
+				movieHTML += person+" - "+role+"<BR>";
+			}
+			movieHTML += "</td>";
+			
 			releaseDate = movie["release"];
 			if (releaseDate == null) {
-				movieHTML += "<td>TBD</td>";
+				movieHTML += "<td width='20%'>TBD</td>";
 			} else {
 				movieHTML += "<td>"+releaseDate+"</td>";
 			}
@@ -142,6 +183,7 @@ function updateMoveList() {
 	} else {
 		$("#movieList").html("");
 	}
+	$("#movieList").effect("slide",{ direction: "right" }, 250);
 }
 
 function movieSorter(a,b) {
@@ -164,14 +206,6 @@ function movieSorter(a,b) {
 
 $.fx.speeds._default = 1000;
 $(function() {
-	$( "#searchResults" ).dialog({
-		autoOpen: false,
-		show: "blind",
-		hide: "explode",
-		width: 400,
-		maxHeight: 400
-	});
-	
 	$('#spinner').hide();
 	
 	$("#searchBox").keyup(function(event){
