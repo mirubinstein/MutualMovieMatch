@@ -24,11 +24,13 @@ function searchPersonCallback(result) {
 		resultHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
 		for (var i = 0; i < result.length; i++) {
 			var imageURL = "";
+			resultHTML += "<tr>";
+			resultHTML += "<td width='25%'>";
 			if (result[i]["profile"].length > 0) {
 				imageURL = result[i]["profile"][0]["image"]["url"];
+				resultHTML += "<img src='"+imageURL+"'>";
 			}
-			resultHTML += "<tr>";
-			resultHTML += "<td width='25%'><img src='"+imageURL+"'></td>";
+			resultHTML != "</td>";
 			resultHTML += "<td width='65%'>"+result[i]["name"]+"</td>";
 			resultHTML += "<td width='10%'><button onclick=addPerson("+result[i]["id"]+")>Add</button>";
 			resultHTML += "</tr>";
@@ -90,28 +92,34 @@ function numPeople() {
 
 function updatePeopleList() {
 	if (numPeople() > 0) {
-		var listHTML = "Actor List";
+		var listHTML = "<b>Actor List</b>";
 		listHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
 		for (var id in people) {
 			var imageURL = "";
+			listHTML += "<tr>";
+			listHTML += "<td width='30%'>";
 			if (people[id]["profile"].length > 0) {
 				imageURL = people[id]["profile"][1]["image"]["url"];
-			}
-			listHTML += "<tr>";
-			listHTML += "<td width='30%'><img src='"+imageURL+"' width='100%'></td>";
-			
+				listHTML += "<img src='"+imageURL+"' width='100%'>";
+			}			
+			listHTML += "</td>";
 			listHTML += "<td width='60%'><b>"+people[id]["name"]+"</b><BR>";
-			listHTML += "Born " + people[id]["birthday"] + "<BR>";
-			listHTML += "in " + people[id]["birthplace"] + "</td>";
+			if ("birthday" in people[id] && people[id]["birthday"] != null && people[id]["birthday"] != "") {
+				listHTML += "Born " + people[id]["birthday"] + "<BR>";
+			}
+			
+			if ("birthplace" in people[id] && people[id]["birthplace"] != null && people[id]["birthplace"] != "") {
+				listHTML += "in " + people[id]["birthplace"] + "</td>";
+			}
 			
 			listHTML += "<td width='10%'><button onclick='removePerson(\""+id+"\")'>X</button></td>";
 			listHTML += "</tr>";
 		}
 		$("#actorList").html(listHTML);
+		$("#actorList").effect("slide",{ direction: "left" }, 250);
 	} else {
 		$("#actorList").html("");
 	}
-	$("#actorList").effect("slide",{ direction: "left" }, 250);
 }
 
 function getJob(person,movie) {
@@ -161,18 +169,23 @@ function updateMovieList() {
 	movieList.sort(movieSorter);
 	
 	if (movieList.length > 0) {
-		var movieHTML = "Mutual Movies";
+		var movieHTML = "<b>Mutual Movies</b>";
 		movieHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
 		for (var mid in movieList) {
 			movie = movieList[mid];
-			movieHTML += "<tr>";
-			imageURL = movie["poster"];
-			movieHTML += "<td width='25%'><img src='"+imageURL+"' width='80%'></td>";
-			
+			movieHTML += "<tr><td width='25%'>";
+			if (movie["poster"] != "") {
+				imageURL = movie["poster"];
+				movieHTML += "<img src='"+imageURL+"' width='80%'>";
+			} 
+			movieHTML += "</td>";
 			movieHTML += "<td width='55%'><h3>"+movie["name"]+"</h3>";
 			for (var id in people) {
 				var person = "<b>"+people[id]["name"]+"</b>";
 				var role = getJob(id,movie["id"]);
+				if (role == "null" || role == "") {
+					role = "Unnamed"
+				}
 				movieHTML += person+" - "+role+"<BR>";
 			}
 			movieHTML += "</td>";
@@ -187,15 +200,16 @@ function updateMovieList() {
 			
 		}
 		$("#movieList").html(movieHTML);
+		$("#movieList").effect("slide",{ direction: "right" }, 250);
 	} else if (numPeople() > 0) {
 		var movieHTML = "Mutual Movies";
 		movieHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr><td align='center'>";
 		movieHTML += "These people have not been in a movie together!</td></tr></table>"
 		$("#movieList").html(movieHTML);
+		$("#movieList").effect("slide",{ direction: "right" }, 250);
 	} else {
 		$("#movieList").html("");
 	}
-	$("#movieList").effect("slide",{ direction: "right" }, 250);
 }
 
 function movieSorter(a,b) {
@@ -216,7 +230,7 @@ function movieSorter(a,b) {
 	}
 }
 
-$.fx.speeds._default = 1000;
+$.fx.speeds._default = 500;
 $(function() {
 	$('#spinner').hide();
 	
