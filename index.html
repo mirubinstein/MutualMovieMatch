@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>Mutual Movie Match</title>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 <link rel="stylesheet" href="styles.css" />
 
@@ -19,11 +20,23 @@
 
 <div align="center" id="spinner"><img src="images/loadbar.gif"></div>
 
-<div align="center" id="searchResults" title="Search Results"></div>
+<div id="searchWrapper">
+	<div align="center" id="searchHeader"></div>
+	<div align="center" id="searchResults" title="Search Results"></div>
+</div>
 
 <div align="center" id="actorList"></div>
 
 <div align="center" id="movieList"></div>
 
+<div id="infoWrapper">
+	<div align="center" id="moreInfo">
+		<div id="infoHeader"></div>
+		<div id="infoLeft"></div>
+		<div align="left" id="infoRight"></div>
+	</div>
+</div>
+
+<div id="mask"></div>
 </body>
 </html>

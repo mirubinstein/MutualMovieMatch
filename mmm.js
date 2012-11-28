@@ -19,7 +19,9 @@ function searchPerson(name) {
 }
 
 function searchPersonCallback(result) {
-	var resultHTML = "<button onclick='closeSearch()'>Close</button>";
+	var headerHTML = "<button onclick='closeSearch()'>Close</button>";
+	$("#searchHeader").html(headerHTML);
+	var resultHTML = "";
 	if (result[0] != "Nothing found.") {
 		resultHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
 		for (var i = 0; i < result.length; i++) {
@@ -43,17 +45,21 @@ function searchPersonCallback(result) {
 	}
 	$("#searchResults").html(resultHTML);
 	$('#spinner').hide();
-	$("#searchResults").effect("slide",{ direction: "up" }, 250);
+	$("#searchWrapper").effect("slide",{ direction: "up" }, 250);
+	$("#mask").effect("fade", 250);
+	$("body").css("overflow","hidden");
 }
 
 function closeSearch() {
-	$("#searchResults").hide("slide", {direction: "up"},250);
+	$("#searchWrapper").hide("slide", {direction: "up"},250);
+	$("#mask").hide("fade",250);
+	$("body").css("overflow","auto");
 }
 
 function addPerson(id) {
+	closeSearch();
 	$("#actorList").hide("slide", {direction: "left"},250);
-	$("#movieList").hide("slide", {direction: "right"},250);
-	$("#searchResults").hide("slide", {direction: "up"},250, function() {
+	$("#movieList").hide("slide", {direction: "right"},250,function() {
 		$('#spinner').show();
 		url = "http://api.themoviedb.org/2.1/Person.getInfo/en/json/"+apiKey+"/"+id;
 		$.ajax({
@@ -62,7 +68,6 @@ function addPerson(id) {
 			jsonpCallback:'addPersonCallback'
 		});
 	});
-	
 }
 
 function addPersonCallback(result) {
@@ -103,7 +108,7 @@ function updatePeopleList() {
 				listHTML += "<img src='"+imageURL+"' width='100%'>";
 			}			
 			listHTML += "</td>";
-			listHTML += "<td width='60%'><b>"+people[id]["name"]+"</b><BR>";
+			listHTML += "<td width='60%'><a href='#' onclick='morePersonInfo(\""+id+"\")'><b>"+people[id]["name"]+"</b></a><BR>";
 			if ("birthday" in people[id] && people[id]["birthday"] != null && people[id]["birthday"] != "") {
 				listHTML += "Born " + people[id]["birthday"] + "<BR>";
 			}
@@ -168,8 +173,8 @@ function updateMovieList() {
 	//Sort movieList
 	movieList.sort(movieSorter);
 	
+	var movieHTML = "<b>Mutual Movies</b>";
 	if (movieList.length > 0) {
-		var movieHTML = "<b>Mutual Movies</b>";
 		movieHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr>";
 		for (var mid in movieList) {
 			movie = movieList[mid];
@@ -202,7 +207,6 @@ function updateMovieList() {
 		$("#movieList").html(movieHTML);
 		$("#movieList").effect("slide",{ direction: "right" }, 250);
 	} else if (numPeople() > 0) {
-		var movieHTML = "Mutual Movies";
 		movieHTML += "<table width='95%' RULES=ROWS FRAME=HSIDES><tr><td align='center'>";
 		movieHTML += "These people have not been in a movie together!</td></tr></table>"
 		$("#movieList").html(movieHTML);
@@ -228,6 +232,50 @@ function movieSorter(a,b) {
 			return 1;
 		}
 	}
+}
+
+function morePersonInfo(id) {
+	var name = people[id]["name"];
+	var infoHeaderHTML = "<button onclick='closeInfo()'>Close</button>";
+	infoHeaderHTML += "<h1>"+name+"</h1>";
+	$("#infoHeader").html(infoHeaderHTML);
+	
+	var imageURL = people[id]["profile"][2]["image"]["url"];
+	var infoLeftHTML = "<img src='"+imageURL+"' width='200px'><BR><BR>";
+	
+	if (people[id]["birthday"].length > 0) {
+		var birthday = people[id]["birthday"];
+		infoLeftHTML += "<B>Born</B><BR>"+birthday+"<BR><BR>";
+	}
+	if (people[id]["birthplace"].length > 0) {
+		var birthplace = people[id]["birthplace"];
+		infoLeftHTML += "<B>in</B><BR>"+birthplace+"<BR><BR>";
+	}
+	if (people[id]["known_as"].length > 0) {
+		var knownAs = people[id]["known_as"];
+		infoLeftHTML += "<B>Known As:</B><BR>";
+
+		for (var n = 0; n < knownAs.length ; n++) {
+			infoLeftHTML += knownAs[n]["name"]+"<BR>";
+		}
+	}		
+	$("#infoLeft").html(infoLeftHTML);
+	
+	var infoRightHTML = "<b>Biography</b><BR>";
+	if (people[id]["biography"].length > 0) {
+		var bio = people[id]["biography"];
+		infoRightHTML += bio;
+	}
+	$("#infoRight").html(infoRightHTML);
+	$("#infoWrapper").effect("slide",{ direction: "down" }, 250);
+	$("#mask").effect("fade", 250);
+	$("body").css("overflow","hidden");
+}
+
+function closeInfo() {
+	$("#infoWrapper").hide("slide", {direction: "down"},250);
+	$("#mask").hide("fade", 250);
+	$("body").css("overflow","auto");
 }
 
 $.fx.speeds._default = 500;

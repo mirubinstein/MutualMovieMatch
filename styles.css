@@ -10,14 +10,43 @@ input{
 	margin-right:auto;
 }
 
-#searchResults{ 
+#searchWrapper {
+    width: 100%;
+	height:100%;
+    background-image: none;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    background-position: 0% 0%;
+    position: fixed;
+    top: 0pt;
+    left: 0pt;
+	display:none;
+	z-index:2;
+}
+
+#searchHeader {
 	background: white;
-	width:60%; 
+	width: 80%;
+	margin: auto;
+	max-width:800px;
+	-moz-box-shadow:    0px 3px 2px 3px #ccc;
+	-webkit-box-shadow: 0px 3px 2px 3px #ccc;
+	box-shadow:         0px 3px 2px 3px #ccc;
+	z-index:2;
+}
+
+#searchResults{ 
+	background: white; 
+	max-width:800px;
 	min-height:110px;
-	left:20%;
-	display:none; 
-	position:absolute;
+	height:90%;
+	width:80%;
+	margin: auto;
+	overflow-y: auto;
+	
+	position:relative;
 	top:0px;
+	
 	border-bottom-left-radius: 15px;
 	border-bottom-right-radius: 15px;
 	
@@ -26,7 +55,7 @@ input{
 	box-shadow:         0px 3px 2px 3px #ccc;
 	
 
-	z-index:1;
+	z-index:2;
 }
 
 #actorList {
@@ -61,6 +90,58 @@ input{
 	box-shadow:         -3px 0px 2px 3px #ccc;
 }
 
+#infoWrapper {
+	height:90%;
+    width: 100%;
+    background-image: none;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    background-position: 0% 0%;
+    position: fixed;
+    bottom: 0pt;
+    left: 0pt;
+	display:none;
+	z-index:3;
+}
+
+#moreInfo {
+	height:100%;
+    width: 80%;
+	max-width:800px;
+    margin:auto;
+	bottom:0px;
+	
+	background: white; 
+	
+	border-top-left-radius: 15px;
+	border-top-right-radius: 15px;
+	
+	-moz-box-shadow:    0px -3px 2px 3px #ccc;
+	-webkit-box-shadow: 0px -3px 2px 3px #ccc;
+	box-shadow:         0px -3px 2px 3px #ccc;
+	
+	z-index:3;
+}
+
+#infoLeft{
+	background: white;
+	float:left;
+	width: 40%;
+	left:0px;
+	z-index:3;
+}
+
+#infoRight{
+	background: white;
+	position:relative;
+	width: 60%;
+	height: 80%;
+	bottom:0px;
+	right:10px;
+	overflow-y: auto;
+	z-index:3;
+}
+
 #spinner {
 	position:relative;
 	width:10%;
@@ -68,4 +149,21 @@ input{
 	margin-right:auto;
 	z-index:2;
 	top:2px;
+}
+
+#mask {
+	width:100%;
+	height:100%;
+	background:black;
+	position:fixed;
+	top:0px;
+	bottom:0px;
+	left:0px;
+	z-index:1;
+	display:none;
+	
+	opacity: 0.8;
+	-khtml-opacity: 0.5;
+	-moz-opacity:0.5;
+	filter: alpha(opacity=50);
 }
