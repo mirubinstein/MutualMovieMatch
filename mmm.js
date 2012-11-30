@@ -140,7 +140,11 @@ function getJob(person,movie) {
 			}
 		}
 	}
-	return jobs.slice(0,-2);
+	jobs = jobs.slice(0,-2);
+	if (jobs == "null" || jobs == "") {
+		jobs = "Unnamed"
+	}
+	return jobs;
 	
 }
 
@@ -188,9 +192,7 @@ function updateMovieList() {
 			for (var id in people) {
 				var person = "<b>"+people[id]["name"]+"</b>";
 				var role = getJob(id,movie["id"]);
-				if (role == "null" || role == "") {
-					role = "Unnamed"
-				}
+				
 				movieHTML += person+" - "+role+"<BR>";
 			}
 			movieHTML += "</td>";
@@ -240,14 +242,17 @@ function morePersonInfo(id) {
 	infoHeaderHTML += "<h1>"+name+"</h1>";
 	$("#infoHeader").html(infoHeaderHTML);
 	
-	var imageURL = people[id]["profile"][2]["image"]["url"];
-	var infoLeftHTML = "<img src='"+imageURL+"' width='200px'><BR><BR>";
+	var infoLeftHTML = "";
+	if (people[id]["profile"].length > 0) {
+		var imageURL = people[id]["profile"][2]["image"]["url"];
+		infoLeftHTML = "<img src='"+imageURL+"' width='150px'><BR><BR>";
+	}
 	
 	if (people[id]["birthday"].length > 0) {
 		var birthday = people[id]["birthday"];
 		infoLeftHTML += "<B>Born</B><BR>"+birthday+"<BR><BR>";
 	}
-	if (people[id]["birthplace"].length > 0) {
+	if (people[id]["birthplace"] != null) {
 		var birthplace = people[id]["birthplace"];
 		infoLeftHTML += "<B>in</B><BR>"+birthplace+"<BR><BR>";
 	}
@@ -258,15 +263,74 @@ function morePersonInfo(id) {
 		for (var n = 0; n < knownAs.length ; n++) {
 			infoLeftHTML += knownAs[n]["name"]+"<BR>";
 		}
-	}		
+	}
+	
 	$("#infoLeft").html(infoLeftHTML);
 	
-	var infoRightHTML = "<b>Biography</b><BR>";
-	if (people[id]["biography"].length > 0) {
-		var bio = people[id]["biography"];
-		infoRightHTML += bio;
+	//Prepare right side
+	var hasBio = people[id]["biography"].length > 0;
+	
+	var films = people[id]["filmography"];
+	films.sort(movieSorter);
+	
+	//Remove repeats
+	var tempFilms = [];
+	var movieId = [];
+	for (var movies in films) {
+		if  ($.inArray(films[movies]["id"],movieId) == -1) {
+			movieId.push(films[movies]["id"]);
+			tempFilms.push(films[movies]);
+		}
 	}
+	films = tempFilms;
+	
+	filmHTML = "<table RULES=ROWS FRAME=HSIDES>";
+	for (var movies in films) {
+		filmID = films[movies]["id"];
+		filmName = films[movies]["name"];
+		actorJob = getJob(id,filmID);
+		filmPoster = films[movies]["poster"];
+		filmRelease = films[movies]["release"];
+		
+		filmHTML += "<tr><td width='25%'>";
+		if (filmPoster != "") {
+			filmHTML += "<img src='"+filmPoster+"' width='80%'>";
+		} 
+		filmHTML += "</td>";
+		filmHTML += "<td width='55%'><b>"+filmName+"</b><BR>";
+		filmHTML += actorJob;
+		filmHTML += "</td>";
+		
+		if (filmRelease == null) {
+			filmHTML += "<td width='20%'>TBD</td>";
+		} else {
+			filmHTML += "<td>"+filmRelease+"</td>";
+		}
+		filmHTML += "</tr>";
+	}
+	filmHTML += "</table>";
+	
+	var infoRightHTML = "";
+	if (hasBio) {
+		infoRightHTML += "<div id='infoTabs'><ul>";
+		infoRightHTML += "<li><a href='#infoTabs-1'><B>Filmography</B></a></li>";
+		infoRightHTML += "<li><a href='#infoTabs-2'><B>Biography</B></a></li></ul>";
+		
+		infoRightHTML += "<div id='infoTabs-1'>"+filmHTML+"</div>";
+		
+		infoRightHTML += "<div id='infoTabs-2'>";
+		var bio = "<p align='left'>"+people[id]["biography"]+"</p></div>";
+		infoRightHTML += bio;
+		
+		infoRightHTML += "</div>";
+	} else {
+		infoRightHTML += filmHTML;
+	}
+	
+	
 	$("#infoRight").html(infoRightHTML);
+	$( "#infoTabs" ).tabs();
+	
 	$("#infoWrapper").effect("slide",{ direction: "down" }, 250);
 	$("#mask").effect("fade", 250);
 	$("body").css("overflow","hidden");

@@ -62,7 +62,7 @@ input{
 	background: white;
 	position:absolute;
 	width: 29.5%;
-	top:130px;
+	
 	left:0px;
 	display:none; 
 	border-top-right-radius: 5px;
@@ -78,7 +78,7 @@ input{
 	background: white; 
 	position:absolute;
 	width: 69.5%;
-	top:130px;
+	
 	right:0px;
 	display:none; 
 	border-top-left-radius: 5px;
@@ -126,20 +126,43 @@ input{
 #infoLeft{
 	background: white;
 	float:left;
-	width: 40%;
+	width: 30%;
 	left:0px;
 	z-index:3;
 }
 
 #infoRight{
 	background: white;
-	position:relative;
-	width: 60%;
-	height: 80%;
+	float:right;
+	width: 70%;
+	height: 74%;
 	bottom:0px;
-	right:10px;
-	overflow-y: auto;
+	right:0px;
 	z-index:3;
+	
+	font-size:small;
+}
+
+.ui-tabs .ui-tabs-nav li {
+    width:48%;
+    text-align: center;
+}
+.ui-tabs .ui-tabs-nav li a {
+    display: inline-block;
+    float: none;
+    padding: 5px;
+    text-decoration: none;
+    width: 96%;
+}
+
+#infoTabs-1 {
+	overflow-y: auto;
+	height:100%;
+}
+
+#infoTabs-2 {
+	overflow-y: auto;
+	height:100%;
 }
 
 #spinner {
